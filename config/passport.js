@@ -1,39 +1,57 @@
-const LocalStrategy = require("passport-local").Strategy;
+// const LocalStrategy = require("passport-local").Strategy;
 const mongoose = require("mongoose");
 const bcrypt = require("bcryptjs");
 const passport = require("passport");
+const request = require("request").defaults({ rejectUnauthorized: false });
 const CustomStrategy = require("passport-custom").Strategy;
 // Load User Model
 const User = require("../models/User");
 
-module.exports = function(passpprt) {
+module.exports = function(passport) {
   passport.use(
-    new LocalStrategy({ usernameField: "email" }, (email, password, done) => {
-      //Matching User
-      User.findOne({ email: email })
-        .then(user => {
-          if (!user) {
-            return done(null, false, { message: "That email is not register" });
+    new CustomStrategy((req, done) => {
+      request.post(
+        "https://10.10.5.103/authenticate",
+        {
+          form: {
+            username: req.body.email,
+            password: req.body.password,
+            type: "plain",
+            ignoreRedirect: true,
+            forceLogin: true
           }
-          //Match Password
-          bcrypt.compare(password, user.password, (err, isMatch) => {
-            if (err) throw err;
-            if (isMatch) {
-              return done(null, user);
-            } else {
-              return done(null, false, { message: "Password in correct" });
-            }
+        },
+        (err, httpResponse, body) => {
+          if (err) console.log(err);
+          body = JSON.parse(body);
+          if (body["message"] === "Invalid username or password") {
+            return callback(null, false, {
+              message: "Invalid username or password"
+            });
+          }
+          if (body["success"] === true) {
+            return callback(null, httpResponse.headers);
+          }
+        }
+      );
+      function callback(err, content) {
+        if (content) {
+          // console.log(content);
+          done(null, content);
+        } else {
+          // console.log("Login fail isus");
+          done(null, false, {
+            message: "Username or password is not correct please try again."
           });
-        })
-        .catch(err => console.log(err));
+        }
+      }
     })
   );
-  passport.serializeUser((user, done) => {
-    done(null, user.id);
+  passport.serializeUser(function(user, done) {
+    done(null, user["set-cookie"]);
   });
-  passport.deserializeUser((id, done) => {
-    User.findById(id, (err, user) => {
-      done(err, user);
-    });
+
+  passport.deserializeUser(function(id, done) {
+    done(null, id);
   });
 };
