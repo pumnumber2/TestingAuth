@@ -1,24 +1,16 @@
 const mongoose = require("mongoose");
 
-const UserSchema = new mongoose.Schema({
+const CookieDBSchema = new mongoose.Schema({
   name: {
     type: String,
     required: true
   },
-  email: {
-    type: String,
-    required: true
-  },
-  password: {
-    type: String,
-    required: true
-  },
-  date: {
+  dateCreate: {
     type: Date,
     default: Date.now
   }
 });
 
-const User = mongoose.model("User", UserSchema);
+const User = mongoose.model("CookieDB", CookieDBSchema);
 
 module.exports = User;

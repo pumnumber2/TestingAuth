@@ -1,16 +1,14 @@
 const CustomStrategy = require("passport-custom").Strategy;
-
-// const mongoose = require("mongoose");
 const request = require("request").defaults({ rejectUnauthorized: false });
 
-// Load User Model
-const User = require("../models/User").default;
+const crossflowAuthenticationPath = require("./keys")
+  .crossflowAuthenticationPath;
 
 module.exports = function(passport) {
   passport.use(
     new CustomStrategy((req, done) => {
       request.post(
-        "https://10.10.5.103/authenticate",
+        crossflowAuthenticationPath,
         {
           form: {
             username: req.body.email,
@@ -29,13 +27,13 @@ module.exports = function(passport) {
             });
           }
           if (body["success"] === true) {
-            return callback(null, httpResponse.headers);
+            return callback(null, httpResponse.headers["set-cookie"]);
           }
         }
       );
-      function callback(err, content) {
-        if (content) {
-          done(null, content);
+      function callback(err, cookie) {
+        if (cookie) {
+          done(null, cookie);
         } else {
           done(null, false, {
             message: "Username or password is not correct please try again."
@@ -45,7 +43,7 @@ module.exports = function(passport) {
     })
   );
   passport.serializeUser(function(user, done) {
-    done(null, user["set-cookie"]);
+    done(null, user);
   });
 
   passport.deserializeUser(function(user, done) {
