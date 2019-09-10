@@ -1,11 +1,10 @@
-// const LocalStrategy = require("passport-local").Strategy;
-const mongoose = require("mongoose");
-const bcrypt = require("bcryptjs");
-const passport = require("passport");
-const request = require("request").defaults({ rejectUnauthorized: false });
 const CustomStrategy = require("passport-custom").Strategy;
+
+// const mongoose = require("mongoose");
+const request = require("request").defaults({ rejectUnauthorized: false });
+
 // Load User Model
-const User = require("../models/User");
+const User = require("../models/User").default;
 
 module.exports = function(passport) {
   passport.use(

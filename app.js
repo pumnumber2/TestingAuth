@@ -1,10 +1,12 @@
 const express = require("express");
 const expressLayout = require("express-ejs-layouts");
-const mongoose = require("mongoose");
 const flash = require("connect-flash");
-const app = express();
-const session = require("express-session");
+const mongoose = require("mongoose");
 const passport = require("passport");
+const session = require("express-session");
+
+const app = express();
+
 // Passport config
 require("./config/passport")(passport);
 // DB Config

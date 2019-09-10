@@ -1,7 +1,8 @@
-const express = require("express");
-const router = express.Router();
 const bcrypt = require("bcryptjs");
+const express = require("express");
 const passport = require("passport");
+
+const router = express.Router();
 //User model
 const User = require("../models/User");
 //Login Page
