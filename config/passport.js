@@ -36,10 +36,8 @@ module.exports = function(passport) {
       );
       function callback(err, content) {
         if (content) {
-          // console.log(content);
           done(null, content);
         } else {
-          // console.log("Login fail isus");
           done(null, false, {
             message: "Username or password is not correct please try again."
           });
@@ -51,7 +49,7 @@ module.exports = function(passport) {
     done(null, user["set-cookie"]);
   });
 
-  passport.deserializeUser(function(id, done) {
-    done(null, id);
+  passport.deserializeUser(function(user, done) {
+    done(null, user);
   });
 };
